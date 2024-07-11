@@ -2483,6 +2483,7 @@ const RAW_RUNTIME_STATE =
           ["@types/react", "npm:18.3.2"],\
           ["@types/react-dom", "npm:18.3.0"],\
           ["@vitejs/plugin-react", "virtual:8b3f5ea1e24b4f8c2c134b0549a9beb03395fa42c8f98efae8a764a43a94bc8ea254baae272c313374761823bdf09895a2fd5c4131e5615f3c5c85481d0c3dc6#npm:4.2.1"],\
+          ["ag-grid-react", "virtual:8b3f5ea1e24b4f8c2c134b0549a9beb03395fa42c8f98efae8a764a43a94bc8ea254baae272c313374761823bdf09895a2fd5c4131e5615f3c5c85481d0c3dc6#npm:32.0.1"],\
           ["clsx", "npm:2.1.1"],\
           ["color", "npm:4.2.3"],\
           ["dompurify", "npm:3.1.3"],\
@@ -3562,6 +3563,53 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/adler-32-npm-1.3.1-8493d3a628-e11d70c113.zip/node_modules/adler-32/",\
         "packageDependencies": [\
           ["adler-32", "npm:1.3.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["ag-charts-types", [\
+      ["npm:10.0.1", {\
+        "packageLocation": "./.yarn/cache/ag-charts-types-npm-10.0.1-21242cb420-13825e4e3b.zip/node_modules/ag-charts-types/",\
+        "packageDependencies": [\
+          ["ag-charts-types", "npm:10.0.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["ag-grid-community", [\
+      ["npm:32.0.1", {\
+        "packageLocation": "./.yarn/cache/ag-grid-community-npm-32.0.1-8bdf6a8412-d2d7719510.zip/node_modules/ag-grid-community/",\
+        "packageDependencies": [\
+          ["ag-grid-community", "npm:32.0.1"],\
+          ["ag-charts-types", "npm:10.0.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["ag-grid-react", [\
+      ["npm:32.0.1", {\
+        "packageLocation": "./.yarn/cache/ag-grid-react-npm-32.0.1-cef49a9bea-49346e7db7.zip/node_modules/ag-grid-react/",\
+        "packageDependencies": [\
+          ["ag-grid-react", "npm:32.0.1"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:8b3f5ea1e24b4f8c2c134b0549a9beb03395fa42c8f98efae8a764a43a94bc8ea254baae272c313374761823bdf09895a2fd5c4131e5615f3c5c85481d0c3dc6#npm:32.0.1", {\
+        "packageLocation": "./.yarn/__virtual__/ag-grid-react-virtual-099d4a5c08/0/cache/ag-grid-react-npm-32.0.1-cef49a9bea-49346e7db7.zip/node_modules/ag-grid-react/",\
+        "packageDependencies": [\
+          ["ag-grid-react", "virtual:8b3f5ea1e24b4f8c2c134b0549a9beb03395fa42c8f98efae8a764a43a94bc8ea254baae272c313374761823bdf09895a2fd5c4131e5615f3c5c85481d0c3dc6#npm:32.0.1"],\
+          ["@types/react", "npm:18.3.2"],\
+          ["@types/react-dom", "npm:18.3.0"],\
+          ["ag-grid-community", "npm:32.0.1"],\
+          ["prop-types", "npm:15.8.1"],\
+          ["react", "npm:18.3.1"],\
+          ["react-dom", "virtual:8b3f5ea1e24b4f8c2c134b0549a9beb03395fa42c8f98efae8a764a43a94bc8ea254baae272c313374761823bdf09895a2fd5c4131e5615f3c5c85481d0c3dc6#npm:18.3.1"]\
+        ],\
+        "packagePeers": [\
+          "@types/react-dom",\
+          "@types/react",\
+          "react-dom",\
+          "react"\
         ],\
         "linkType": "HARD"\
       }]\
