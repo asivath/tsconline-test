@@ -194,7 +194,7 @@ jobs:
       id: check_codeowner
       run: |
         PR_AUTHOR=${{ github.event.pull_request.user.login }}
-        CODEOWNERS=$(cat CODEOWNERS)
+        CODEOWNERS=$(cat .github/CODEOWNERS)
         echo "PR Author: $PR_AUTHOR"
         echo "Code Owners: $CODEOWNERS"
         if echo "$CODEOWNERS" | grep -q "$PR_AUTHOR"; then
