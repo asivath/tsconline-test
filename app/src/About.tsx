@@ -16,8 +16,6 @@ import AdityaPic from "./assets/aboutPictures/AdityaSivathanu.jpg";
 import AaronPic from "./assets/aboutPictures/AaronAult.jpg";
 import TobyPic from "./assets/aboutPictures/TobyOnyekwere.png";
 import RebeccaPic from "./assets/aboutPictures/RebeccaRupp.png";
-import JenniferPic from "./assets/aboutPictures/JenniferYu.jpg";
-import KevinChang from "./assets/aboutPictures/KevinChang.jpg";
 
 const HeaderContainer = styled("div")(({ theme }) => ({
   display: "flex",
@@ -111,20 +109,6 @@ const members = [
     homeTown: "Houston, Texas",
     timeWorked: "2024 - Present",
     proPic: RebeccaPic
-  },
-  {
-    name: "Jennifer Yu",
-    role: "Member",
-    homeTown: "West Lafayette, IN",
-    timeWorked: "2024",
-    proPic: JenniferPic
-  },
-  {
-    name: "Kevin Chang",
-    role: "Member",
-    homeTown: "West Lafayette, IN",
-    timeWorked: "2024 - Present",
-    proPic: KevinChang
   }
 ];
 
