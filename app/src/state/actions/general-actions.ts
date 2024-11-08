@@ -259,6 +259,7 @@ export const uploadUserDatapack = action(
           pushError(ErrorCodes.USER_FETCH_DATAPACK_FAILED);
           return;
         }
+        console.log(datapack);
         addDatapack(datapack);
         if (metadata.isPublic) {
           refreshPublicDatapacks();
