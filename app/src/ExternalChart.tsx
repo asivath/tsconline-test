@@ -2,7 +2,6 @@ import { observer } from "mobx-react-lite";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { Paper } from "@mui/material";
-import { set } from "lodash";
 
 export const ExternalChart = observer(() => {
   const location = useLocation();
