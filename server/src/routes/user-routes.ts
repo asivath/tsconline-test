@@ -255,6 +255,26 @@ export const fetchUserDatapacks = async function fetchUserDatapacks(request: Fas
   }
 };
 
+export const fetchTreatiseDatapack = async function fetchTreatiseDatapacks(
+  request: FastifyRequest<{ Params: { datapack: string } }>,
+  reply: FastifyReply
+) {
+  const { datapack } = request.params;
+  const uuid = "treatise";
+  try {
+    const treatiseDatapack = await fetchUserDatapack(uuid, datapack).catch(() => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    });
+    if (!treatiseDatapack) {
+      reply.status(500).send({ error: "Datapack does not exist or cannot be found" });
+      return;
+    }
+    reply.send(treatiseDatapack);
+  } catch (e) {
+    reply.status(500).send({ error: "Failed to fetch datapacks" });
+  }
+};
+
 // If at some point a delete datapack function is needed, this function needs to be modified for race conditions
 export const uploadDatapack = async function uploadDatapack(request: FastifyRequest, reply: FastifyReply) {
   const uuid = request.session.get("uuid");
@@ -397,4 +417,130 @@ export const userDeleteDatapack = async function userDeleteDatapack(
     return;
   }
   reply.status(200).send({ message: "Datapack deleted" });
+};
+
+export const uploadTreatiseDatapack = async function uploadTreatiseDatapack(
+  request: FastifyRequest,
+  reply: FastifyReply
+) {
+  async function errorHandler(message: string, errorStatus: number, e?: unknown) {
+    e && console.error(e);
+    reply.status(errorStatus).send({ error: message });
+  }
+
+  try {
+    // Check token
+    const authHeader = request.headers["authorization"];
+    if (!authHeader) {
+      reply.status(401).send({ error: "Token missing" });
+      return;
+    }
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+      reply.status(401).send({ error: "Token missing" });
+      return;
+    }
+    const validToken = process.env.BEARER_TOKEN;
+    if (!validToken) {
+      reply.status(500).send({
+        error: "Server misconfiguration: Missing BEARER_TOKEN on TSC Online. Contact admin"
+      });
+      return;
+    }
+    if (token !== validToken) {
+      reply.status(403).send({ error: "Token mismatch" });
+      return;
+    }
+    // Set the treatise UUID
+    const treatiseUUID = "treatise";
+
+    const parts = request.parts();
+    const fields: Record<string, string> = {};
+    let uploadedFile: MultipartFile | undefined;
+    let filepath: string | undefined;
+    let originalFilename: string | undefined;
+    let storedFilename: string | undefined;
+
+    const cleanupTempFiles = async () => {
+      filepath && (await rm(filepath, { force: true }));
+      if (fields.title) {
+        await deleteUserDatapack(treatiseUUID, fields.title);
+      }
+    };
+
+    // Get the directory for the 'treatise' user
+    const extDirectory = await getPrivateUserUUIDDirectory(treatiseUUID);
+
+    try {
+      for await (const part of parts) {
+        if (part.type === "file") {
+          if (part.fieldname === "datapack") {
+            uploadedFile = part;
+            storedFilename = makeTempFilename(uploadedFile.filename);
+            filepath = path.join(extDirectory, storedFilename);
+            originalFilename = uploadedFile.filename;
+
+            if (!checkFileTypeIsDatapack(uploadedFile)) {
+              reply.status(415).send({ error: "Invalid file type" });
+              return;
+            }
+            const { code, message } = await uploadFileToFileSystem(uploadedFile, filepath);
+            if (code !== 200) {
+              reply.status(code).send({ error: message });
+              await cleanupTempFiles();
+              return;
+            }
+          }
+        } else if (part.type === "field" && typeof part.fieldname === "string" && typeof part.value === "string") {
+          fields[part.fieldname] = part.value;
+        }
+      }
+    } catch (e) {
+      await cleanupTempFiles();
+      reply.status(500).send({ error: "Failed to upload file with error " + e });
+      return;
+    }
+
+    if (!uploadedFile || !filepath || !originalFilename || !storedFilename) {
+      await cleanupTempFiles();
+      reply.status(400).send({ error: "No file uploaded" });
+      return;
+    }
+
+    fields.storedFileName = storedFilename;
+    fields.originalFileName = originalFilename;
+    fields.filepath = filepath;
+
+    // Process the datapack metadata
+    const datapackMetadata = await uploadUserDatapackHandler(reply, fields, uploadedFile.file.bytesRead).catch(
+      async (e) => {
+        await cleanupTempFiles();
+        reply.status(500).send({ error: "Failed to upload datapack with error " + e });
+      }
+    );
+
+    if (!datapackMetadata) {
+      return;
+    }
+
+    // Check if a datapack with the same title already exists
+    if (await doesDatapackFolderExistInAllUUIDDirectories(treatiseUUID, datapackMetadata.title)) {
+      // delete temp file
+      filepath && (await rm(filepath, { force: true }));
+      reply.status(200).send({ hash: datapackMetadata.title });
+      return;
+    }
+
+    try {
+      // Set up the new datapack directory
+      await setupNewDatapackDirectoryInUUIDDirectory(treatiseUUID, filepath, datapackMetadata, false, undefined);
+    } catch (e) {
+      await errorHandler("Failed to load and write metadata for file", 500, e);
+      return;
+    }
+    reply.status(200).send({ hash: datapackMetadata.title });
+  } catch (error) {
+    console.error("Error during /externalChart route:", error);
+    reply.status(500).send({ error: "Internal server error" });
+  }
 };

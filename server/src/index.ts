@@ -21,7 +21,7 @@ import path from "path";
 import { adminRoutes } from "./admin/admin-auth.js";
 import PQueue from "p-queue";
 import { userRoutes } from "./routes/user-auth.js";
-import { fetchUserDatapacks } from "./routes/user-routes.js";
+import { fetchUserDatapacks, uploadTreatiseDatapack, fetchTreatiseDatapack } from "./routes/user-routes.js";
 import logger from "./error-logger.js";
 
 const maxConcurrencySize = 2;
@@ -237,7 +237,7 @@ server.register(adminRoutes, { prefix: "/admin" });
 server.register(userRoutes, { prefix: "/user" });
 // this is seperate from the user routes because it doesn't require recaptcha
 server.get("/user/datapacks", looseRateLimit, fetchUserDatapacks);
-
+server.get("/treatise/datapacks/:datapack", moderateRateLimit, fetchTreatiseDatapack);
 server.post("/auth/oauth", strictRateLimit, loginRoutes.googleLogin);
 server.post("/auth/login", strictRateLimit, loginRoutes.login);
 server.post("/auth/signup", strictRateLimit, loginRoutes.signup);
@@ -253,6 +253,7 @@ server.post("/auth/change-password", strictRateLimit, loginRoutes.changePassword
 server.post("/auth/account-recovery", strictRateLimit, loginRoutes.accountRecovery);
 server.post("/auth/delete-profile", moderateRateLimit, loginRoutes.deleteProfile);
 server.post("/upload-profile-picture", moderateRateLimit, loginRoutes.uploadProfilePicture);
+server.post("/externalChart", moderateRateLimit, uploadTreatiseDatapack);
 
 // generates chart and sends to proper directory
 // will return url chart path and hash that was generated for it

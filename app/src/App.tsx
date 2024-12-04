@@ -22,7 +22,7 @@ import "./App.css";
 import { DatapackProfile } from "./DatapackProfile";
 import { Profile } from "./account_settings/Profile";
 import { Admin } from "./admin/Admin";
-import { ExternalChart } from "./ExternalChart";
+import { GenerateExternalChart } from "./GenerateExternalChart";
 import { LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { TSCLoadingDatapacks } from "./components/TSCLoadingDatapacks";
@@ -73,7 +73,7 @@ export default observer(function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/datapack/:id" element={<DatapackProfile />} />
             <Route path="/admin" element={<Admin />} />
-            <Route path="/externalChart" element={<ExternalChart />} />
+            <Route path="/GenerateexternalChart" element={<GenerateExternalChart />} />
           </Routes>
           {Array.from(state.errors.errorAlerts.entries()).map(([context, error], index) => (
             <TSCError
