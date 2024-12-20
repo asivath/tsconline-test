@@ -419,6 +419,7 @@ export const userDeleteDatapack = async function userDeleteDatapack(
   reply.status(200).send({ message: "Datapack deleted" });
 };
 
+// Title of the datapack from treatise is a hash generated on Treatise side
 export const uploadTreatiseDatapack = async function uploadTreatiseDatapack(
   request: FastifyRequest,
   reply: FastifyReply
@@ -451,9 +452,8 @@ export const uploadTreatiseDatapack = async function uploadTreatiseDatapack(
       reply.status(403).send({ error: "Token mismatch" });
       return;
     }
-    // Set the treatise UUID
-    const treatiseUUID = "treatise";
 
+    const treatiseUUID = "treatise";
     const parts = request.parts();
     const fields: Record<string, string> = {};
     let uploadedFile: MultipartFile | undefined;
@@ -468,7 +468,6 @@ export const uploadTreatiseDatapack = async function uploadTreatiseDatapack(
       }
     };
 
-    // Get the directory for the 'treatise' user
     const extDirectory = await getPrivateUserUUIDDirectory(treatiseUUID);
 
     try {
@@ -479,7 +478,6 @@ export const uploadTreatiseDatapack = async function uploadTreatiseDatapack(
             storedFilename = makeTempFilename(uploadedFile.filename);
             filepath = path.join(extDirectory, storedFilename);
             originalFilename = uploadedFile.filename;
-
             if (!checkFileTypeIsDatapack(uploadedFile)) {
               reply.status(415).send({ error: "Invalid file type" });
               return;
@@ -511,7 +509,6 @@ export const uploadTreatiseDatapack = async function uploadTreatiseDatapack(
     fields.originalFileName = originalFilename;
     fields.filepath = filepath;
 
-    // Process the datapack metadata
     const datapackMetadata = await uploadUserDatapackHandler(reply, fields, uploadedFile.file.bytesRead).catch(
       async (e) => {
         await cleanupTempFiles();
@@ -523,9 +520,8 @@ export const uploadTreatiseDatapack = async function uploadTreatiseDatapack(
       return;
     }
 
-    // Check if a datapack with the same title already exists
     if (await doesDatapackFolderExistInAllUUIDDirectories(treatiseUUID, datapackMetadata.title)) {
-      // delete temp file
+      // delete temp file because dataoack already exists
       filepath && (await rm(filepath, { force: true }));
       reply.status(200).send({ hash: datapackMetadata.title });
       return;

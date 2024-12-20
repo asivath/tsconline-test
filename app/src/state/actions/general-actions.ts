@@ -225,8 +225,7 @@ export const fetchTreatiseDatapacks = action("fetchTreatiseDatapacks", async (da
     const data = await response.json();
     try {
       assertDatapack(data);
-      addDatapack(data); // Add the datapack to your state/store
-      console.log("Datapack loaded");
+      addDatapack(data);
     } catch (e) {
       displayServerError(data, ErrorCodes.INVALID_USER_DATAPACKS, ErrorMessages[ErrorCodes.INVALID_USER_DATAPACKS]);
       console.error(e);
@@ -279,7 +278,6 @@ export const uploadUserDatapack = action(
           pushError(ErrorCodes.USER_FETCH_DATAPACK_FAILED);
           return;
         }
-        console.log(datapack);
         addDatapack(datapack);
         if (metadata.isPublic) {
           refreshPublicDatapacks();
