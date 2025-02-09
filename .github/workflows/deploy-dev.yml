@@ -112,6 +112,7 @@ jobs:
           fi
           if [ "$OLD_JAR" != "$NEW_JAR" ]; then
             echo "new_active_jar=$NEW_JAR" >> $GITHUB_OUTPUT
+            echo "old_active_jar=$OLD_JAR" >> $GITHUB_OUTPUT
           fi
 
       - name: Determine if building Jar is necessary
@@ -161,6 +162,14 @@ jobs:
             echo "Failed to make jar."
             exit 1
           fi
+      
+      - name: Parse DecryptionJar Name
+        if: steps.build_necessary.outputs.build_necessary == 'true' || steps.download_pr_artifacts.outputs.jar_download_status == 'success'
+        id: parse_decryption_jar
+        run: |
+          JAR_NAME=$(jq -r '.decryptionJar' server/assets/config.json | xargs basename)
+          echo "name=$JAR_NAME" >> $GITHUB_OUTPUT
+          echo "Decryption Jar: $JAR_NAME"
 
       - name: Send Artifacts to Server
         run: |
@@ -203,6 +212,7 @@ jobs:
             rm build-artifacts.zip
             if [ -f "${{ steps.check_active_jar.outputs.new_active_jar }}" ]; then
               mv ${{ steps.check_active_jar.outputs.new_active_jar }} ${{ secrets.DEV_PATH }}/server/assets/jars
+              find ${{ secrets.DEV_PATH }}/server/assets/jars -type f | grep -v -e "${{ steps.parse_decryption_jar.outputs.name }}" -e "${{ steps.check_active_jar.outputs.new_active_jar }}" | xargs rm -f
             fi
 
             echo 'EMAIL_USER="${{ secrets.EMAIL_USER }}"' > ./server/.env
@@ -262,6 +272,39 @@ jobs:
               sleep $INTERVAL
               ELAPSED=$((ELAPSED + INTERVAL))
             done
+
+      - name: Send Jar Artifact to Dropbox
+        if: steps.build_necessary.outputs.build_necessary == 'true' || steps.download_pr_artifacts.outputs.jar_download_status == 'success'
+        run: |
+          # --- Upload the new JAR artifact ---
+          DROPBOX_FILE_PATH="${{ secrets.DROPBOX_PATH }}/${{ steps.check_active_jar.outputs.new_active_jar }}"
+          DROPBOX_API_ARG=$(printf '{"path": "%s", "mode": "add", "autorename": false, "mute": true}' "$DROPBOX_FILE_PATH")
+          curl -X POST "https://content.dropboxapi.com/2/files/upload" \
+            --header "Authorization: Bearer ${{ secrets.DROPBOX_ACCESS_TOKEN }}" \
+            --header "Content-Type: application/octet-stream" \
+            --header "Dropbox-API-Arg: $DROPBOX_API_ARG" \
+            --data-binary @"${{ steps.check_active_jar.outputs.new_active_jar }}"
+          echo "Uploaded ${{ steps.check_active_jar.outputs.new_active_jar }} to Dropbox"
+
+          # --- List all JAR files in the base Dropbox folder excluding the new active JAR, old active JAR, and decryption JAR ---
+          LIST_PAYLOAD=$(printf '{"path": "%s", "recursive": true}' "${{ secrets.DROPBOX_PATH }}")
+          FILES_TO_DELETE=$(curl -s -X POST https://api.dropboxapi.com/2/files/list_folder \
+            --header "Authorization: Bearer ${{ secrets.DROPBOX_ACCESS_TOKEN }}" \
+            --header "Content-Type: application/json" \
+            --data "$LIST_PAYLOAD" \
+            | jq -r '.entries[] | select(.name | test("\\.jar$"; "i")) | .name' \
+            | grep -v -e "${{ steps.parse_decryption_jar.outputs.name }}" -e "${{ steps.check_active_jar.outputs.new_active_jar }}" -e "${{ steps.check_active_jar.outputs.old_active_jar }}")
+          echo "Files to delete: $FILES_TO_DELETE"
+
+          # --- Delete the filtered files ---
+          for FILE in $FILES_TO_DELETE; do
+            echo "Deleting $FILE"
+            DELETE_PAYLOAD=$(printf '{"path": "%s/%s"}' "${{ secrets.DROPBOX_PATH }}" "$FILE")
+            curl -s -X POST https://api.dropboxapi.com/2/files/delete_v2 \
+              --header "Authorization: Bearer ${{ secrets.DROPBOX_ACCESS_TOKEN }}" \
+              --header "Content-Type: application/json" \
+              --data "$DELETE_PAYLOAD"
+          done   
 
       - name: Delete build artifacts
         if: steps.download_pr_artifacts.outputs.build_download_status == 'success'
