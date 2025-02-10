@@ -5,7 +5,7 @@ concurrency:
 on:
   push:
     branches:
-      - main
+      - TSC-625-remove-jars-upload-dropbox
 
 jobs:
   deploy:
