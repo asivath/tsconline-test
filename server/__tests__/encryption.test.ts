@@ -45,9 +45,9 @@ describe("runJavaEncrypt", async () => {
   });
   let jarFilePath = "";
   let resultPath = "server/__tests__/__data__/encryption-test-generated-file";
-  if (await checkFileExists("/home/runner/work/tsconline/tsconline/server/assets/jars/testUsageJar.jar")) {
-    jarFilePath = "/home/runner/work/tsconline/tsconline/server/assets/jars/testUsageJar.jar";
-    resultPath = "/home/runner/work/tsconline/tsconline/server/__tests__/__data__/encryption-test-generated-file";
+  if (await checkFileExists("/home/runner/work/tsconline-test/tsconline-test/server/assets/jars/testUsageJar.jar")) {
+    jarFilePath = "/home/runner/work/tsconline-test/tsconline-test/server/assets/jars/testUsageJar.jar";
+    resultPath = "/home/runner/work/tsconline-test/tsconline-test/server/__tests__/__data__/encryption-test-generated-file";
   } else {
     try {
       const contents = JSON.parse((await readFile("server/assets/config.json")).toString());

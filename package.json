@@ -45,6 +45,7 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:case": "vitest run -t",
+    "test:ci": "vitest run --no-color",
     "coverage:ci": "vitest run --coverage --no-color",
     "coverage:ci:exclude-encryption": "vitest run --coverage --no-color --exclude **/encryption.test.ts",
     "coverage": "vitest run --coverage",
