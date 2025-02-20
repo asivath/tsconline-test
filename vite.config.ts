@@ -16,7 +16,26 @@ export default defineConfig({
     include: ["server/__tests__/**.test.ts", "app/__tests__/**.test.ts", "shared/__tests__/**.test.ts"],
     coverage: {
       reporter: ["text", "lcov"],
-      include: ["server/src/**", "app/src/**", "shared/src/**"],
+      include: [
+        "server/src/admin/admin-auth.ts",
+        "server/src/admin/admin-routes.ts",
+        "server/src/encryption.ts",
+        "server/src/routes/login-routes.ts",
+        "server/src/parse-datapacks.ts",
+        "server/src/parse-map-packs.ts",
+        "shared/src/util.ts",
+        "server/src/upload-handlers.ts",
+        "server/src/upload-datapack.ts",
+        "server/src/user-auth.ts",
+        "server/src/cloud/general-cloud-requests.ts",
+        "server/src/cloud/edit-handler.ts",
+        "server/src/workshop/workshop-auth.ts",
+        "server/src/workshop/workshop-routes.ts",
+        "server/src/constants.ts",
+        "server/src/error-logger.ts"
+        // "server/src/user-routes.ts",
+        // "server/src/user/user-handler.ts"
+      ],
       // TODO: add the commented out files
       thresholds: {
         "server/src/admin/admin-auth.ts": thresholdConfig,
